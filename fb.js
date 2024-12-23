@@ -29,14 +29,26 @@ var mode, delta;
 var wechat = false;
 var playend = false, playdata = [];
 var wxData;
+var background;
 
 var clearCanvas = function(){
-	ctx.fillStyle = '#4EC0CA';
-	ctx.fillRect(0, 0, width, height);
+	if (background && background.complete && background.naturalHeight !== 0) {
+		try {
+			ctx.drawImage(background, 0, 0, width, height);
+		} catch(e) {
+			console.error("Erreur lors du dessin du fond:", e);
+			ctx.fillStyle = '#4EC0CA';
+			ctx.fillRect(0, 0, width, height);
+		}
+	} else {
+		ctx.fillStyle = '#4EC0CA';
+		ctx.fillRect(0, 0, width, height);
+	}
 }
 
 var loadImages = function(){
-	var imgNumber = 9, imgComplete = 0;
+	var imgNumber = 10;
+	var imgComplete = 0;
 	var onImgLoad = function(){
 		imgComplete++;
 		if(imgComplete == imgNumber){
@@ -99,6 +111,18 @@ var loadImages = function(){
 	splash = new Image();
 	splash.src = 'images/splash.png';
 	splash.onload = onImgLoad;
+
+	background = new Image();
+	background.onerror = function() {
+		console.error("Erreur de chargement de l'image de fond");
+		background = null;
+	};
+	background.src = 'images/background.png';
+	background.onload = function() {
+		console.log("Fond chargé avec succès");
+		onImgLoad();
+	};
+	console.log("Chargement du fond...");
 }
 
 function is_touch_device() {  
@@ -140,7 +164,7 @@ var deathAnimation = function(){
         playend = true;
         playdata = [mode, score];
         if(window.window.WeixinApi && window.WeixinJSBridge) {
-            //alert("您在 " + ["easy", "normal", "hard"][mode] + " 模式中取得 " + score + " 分，右上角分享成绩到朋友圈吧~");
+            //alert("您在 " + ["easy", "normal", "hard"][mode] + " 模式中取得 " + score + " 分，右上角分享��绩到朋友圈吧~");
         }
     }
 	ctx.drawImage(ready, width / 2 - 57, height / 2 + 10);
@@ -407,7 +431,7 @@ window.onload = function(){
             // 点击分享到朋友圈，会执行下面这个代码
             Api.shareToTimeline(wxData, wxCallbacks);
 
-            // 点击分享到腾讯微博，会执行下面这个代码
+            // 点击分享到腾讯��博，会执行���面这个代码
             Api.shareToWeibo(wxData, wxCallbacks);
 
             // iOS上，可以直接调用这个API进行分享，一句话搞定
